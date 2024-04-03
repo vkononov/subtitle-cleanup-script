@@ -75,6 +75,7 @@ def renumber_srt_files(path)
       block = block.gsub(/\.{4,}/, '...') # change too many periods to ellipses (3 periods)
       block = block.gsub(%r{<font[^>]*>|</font>}, '') # remove <font> tags
       block = block.gsub(/([.?!])([A-Z0-9])/i, '\1 \2') # Add a missing space after .?! followed by a letter or a number
+      block = block.gsub(/(?<!\s|\[)\[(.*?)\]/, ' [\1]') # add missing spaces before square brackets
       block
     end
 
