@@ -5,6 +5,8 @@ require 'fileutils'
 # Special characters
 SPACE = ' '.freeze
 APOSTROPHE = 'â'.freeze
+PARAGRAPH_MARK = '¶'.freeze
+MUSIC_NOTE = '♪'.freeze
 DASH = '-'.encode('utf-8')
 EM_DASH = '—'.encode('utf-8')
 ELLIPSES = '…'.encode('utf-8')
@@ -62,6 +64,7 @@ def renumber_srt_files(path)
     blocks = blocks.map do |block|
       block = block.gsub(APOSTROPHE, "'")
       block = block.gsub(SPACE, ' ')
+      block = block.gsub(PARAGRAPH_MARK, MUSIC_NOTE) # Replace paragraph mark with music note
       block = block.gsub(/#{DASH}#{DASH}(?!>)/, EM_DASH) # replace two dashes by an em dash
       block = block.gsub(/^#{DASH}/, "#{DASH} ") # add space after a dash at beginning of line
       block = block.gsub(/^#{EM_DASH}/, "#{EM_DASH} ") # add space after an em dash at beginning of line
