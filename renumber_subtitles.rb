@@ -67,6 +67,11 @@ def renumber_srt_files(path)
       block = block.gsub(CURSIVE_APOSTROPHE, "'")
       block = block.gsub(SPACE, ' ')
       block = block.gsub(PARAGRAPH_MARK, MUSIC_NOTE) # Replace paragraph mark with music note
+      block = block.gsub(/(?<=\S)#{MUSIC_NOTE}(?=\S)/, " #{MUSIC_NOTE} ")
+                   .gsub(/(?<!\s)#{MUSIC_NOTE}/, " #{MUSIC_NOTE}")
+                   .gsub(/#{MUSIC_NOTE}(?!\s)/, "#{MUSIC_NOTE} ")
+                   .gsub(/ +/, ' ') # Ensure MUSIC_NOTE has space before and after
+      block = block.gsub(/(?<=#{MUSIC_NOTE})\s+(?=#{MUSIC_NOTE})/, '') # Remove extra spaces between music notes
       block = block.gsub(/#{DASH}#{DASH}(?!>)/, EM_DASH) # replace two dashes by an em dash
       block = block.gsub(/^#{DASH}/, "#{DASH} ") # add space after a dash at beginning of line
       block = block.gsub(/^#{EM_DASH}/, "#{EM_DASH} ") # add space after an em dash at beginning of line
