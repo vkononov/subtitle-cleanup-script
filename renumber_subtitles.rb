@@ -6,6 +6,7 @@ require 'fileutils'
 SPACE = ' '.freeze
 APOSTROPHE = 'â'.freeze
 CURSIVE_APOSTROPHE = '’'.freeze
+CURSIVE_QUOTE = '“'.freeze
 PARAGRAPH_MARK = '¶'.freeze
 MUSIC_NOTE = '♪'.freeze
 DASH = '-'.encode('utf-8')
@@ -65,6 +66,7 @@ def renumber_srt_files(path)
     blocks = blocks.map do |block|
       block = block.gsub(APOSTROPHE, "'")
       block = block.gsub(CURSIVE_APOSTROPHE, "'")
+      block = block.gsub(CURSIVE_QUOTE, '"')
       block = block.gsub(SPACE, ' ')
       block = block.gsub(PARAGRAPH_MARK, MUSIC_NOTE) # Replace paragraph mark with music note
       block = block.gsub(/(?<=\S)#{MUSIC_NOTE}(?=\S)/, " #{MUSIC_NOTE} ")
