@@ -81,7 +81,7 @@ def renumber_srt_files(path)
       block = block.gsub(' .', '.').gsub(' :', ':').gsub(' ;', ';').gsub(' ?', '?').gsub(' !', '!') # remove extra spaces before punctuation
       block = block.gsub(/(?<=\(|\{|\[)\s+|\s+(?=\)|\}|\])/, '') # remove space within brackets
       block = block.squeeze(' ') # compress multiple empty spaces into one
-      block = block.gsub(/[[:space:]]+$/, '') # remove empty spaces at the end of each line
+      block = block.lines.map(&:rstrip).join("\n") # remove empty spaces at the end of each line
       block = block.gsub(/#{ELLIPSES}$/, '...') # add space before an em dash at end of line
       block = block.gsub('..', '...') # change double periods to ellipses (3 periods)
       block = block.gsub(/\.{4,}/, '...') # change too many periods to ellipses (3 periods)
