@@ -88,6 +88,7 @@ def renumber_srt_files(path)
       block = block.gsub(%r{<font[^>]*>|</font>}, '') # remove <font> tags
       block = block.gsub(/(\.)(?=[A-Z](?!\w*\.\w*))/, '\1 ') # Add a missing space after . except in version numbers of domains
       block = block.gsub(/([?!])([A-Z0-9])/i, '\1 \2') # Add a missing space after ?! followed by a letter or a number
+      block = block.gsub(/(,)(?=[A-Z]|(?!\d{3})\d)/i, '\1 \2') # Add a missing space after comma followed by a letter or number (except 3-digit numbers)
       block = block.gsub(/(?<!\s|\[)\[(.*?)\]/, ' [\1]') # add missing spaces before square brackets
       block = block.gsub(/\](?=[^\s])/, '] ') # add missing spaces after square brackets
       block = block.gsub(/(<\w+>)\s+|\s+(<\/\w+>)/, '\1\2').gsub(/>\s*</, '> <') # Ensure no space after an opening HTML tag and before a closing HTML tag, but a space between HTML tags
