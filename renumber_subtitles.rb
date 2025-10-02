@@ -65,7 +65,7 @@ def renumber_srt_files(path)
       lines.shift if lines.first&.match?(/\A\p{N}+\z/u)
 
       # Drop any SRT timecode lines (supports , or . as millisecond separator)
-      timecode_re = /\A\d{2}:\d{2}:\d{2}[,.]\d{3}\s*-->\s*\d{2}:\d{2}:\d{2}[,.]\d{3}(?:.*)?\z/
+      timecode_re = /\A\d{2}:\d{2}:\d{2}[,.]\d{3}\s*-->\s*\d{2}:\d{2}:\d{2}[,.]\d{3}.*\z/
       lines.reject! { |l| l.match?(timecode_re) }
 
       # Remove HTML tags but keep inner text (e.g., <i>…</i>)
