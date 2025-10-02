@@ -54,12 +54,39 @@ def renumber_srt_files(path)
     # remove text from each block that represents ads, or subtitle handles, or website urls
     blocks.reject!.each_with_index do |block, index|
       downcased_block = block.downcase
+
       contains_forbidden_text = BLACKLIST_STRINGS.any? { |string| downcased_block.include?(string) }
       too_few_lines = block.lines.count < MIN_LINES_PER_BLOCK
-      if contains_forbidden_text || too_few_lines
-        puts "REJECTED BLOCK #{index + 1}:\n===============\n#{block}\n===============\n\n"
+
+      # --- Extract only the subtitle text payload (no index, no timecode lines) ---
+      lines = block.lines.map(&:strip)
+
+      # Drop the leading index line if it's purely numeric (robust to Unicode digits)
+      lines.shift if lines.first&.match?(/\A\p{N}+\z/u)
+
+      # Drop any SRT timecode lines (supports , or . as millisecond separator)
+      timecode_re = /\A\d{2}:\d{2}:\d{2}[,.]\d{3}\s*-->\s*\d{2}:\d{2}:\d{2}[,.]\d{3}(?:.*)?\z/
+      lines.reject! { |l| l.match?(timecode_re) }
+
+      # Remove HTML tags but keep inner text (e.g., <i>…</i>)
+      text_only = lines.join("\n").gsub(%r{</?[^>]+>}, '')
+
+      # Unicode-aware: drop if the TEXT has no letters or digits in any script
+      no_letters_or_digits_in_text = !text_only.match?(/[\p{L}\p{Nd}\p{Nl}]/u)
+
+      should_reject = contains_forbidden_text || too_few_lines || no_letters_or_digits_in_text
+
+      if should_reject
+        reasons = []
+        reasons << "blacklist" if contains_forbidden_text
+        reasons << "too_few_lines" if too_few_lines
+        reasons << "no_letters_or_digits_in_text" if no_letters_or_digits_in_text
+
+        puts "REJECTED BLOCK #{index + 1} (#{reasons.join(', ')}):\n" \
+               "===============\n#{block}\n===============\n\n"
       end
-      contains_forbidden_text || too_few_lines
+
+      should_reject
     end
 
     # clean up dashes
