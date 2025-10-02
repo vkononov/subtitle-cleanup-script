@@ -111,6 +111,8 @@ def renumber_srt_files(path)
       block = block.lines.map(&:rstrip).join("\n") # remove empty spaces at the end of each line
       block = block.gsub(/#{ELLIPSES}$/, '...') # add space before an em dash at end of line
       block = block.gsub('..', '...') # change double periods to ellipses (3 periods)
+      block = block.gsub(/(\.\.\.|#{ELLIPSES})(?=(?!\s)[\p{L}\p{Nd}\p{Nl}\p{Ps}\p{Pi}])/u, '\1 ') # Ensure a space after an ellipsis (either '...' or '…') when followed by a letter/number or opening punctuation/quote
+      block = block.gsub(/(\.\.\.|#{ELLIPSES})(?=—)/u, '\1 ')  # Add a space before an em dash if it follows an ellipsis with no space (e.g., "...—" -> "... —")
       block = block.gsub(/\.{4,}/, '...') # change too many periods to ellipses (3 periods)
       block = block.gsub(%r{<font[^>]*>|</font>}, '') # remove <font> tags
       block = block.gsub(/(\.)(?=[A-Z](?!\w*\.\w*))/, '\1 ') # Add a missing space after . except in version numbers of domains
