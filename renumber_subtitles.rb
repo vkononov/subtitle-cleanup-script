@@ -120,7 +120,17 @@ def renumber_srt_files(path)
       block = block.gsub(/(,)(?=[A-Z]|(?!\d{3})\d)/i, '\1 \2') # Add a missing space after comma followed by a letter or number (except 3-digit numbers)
       block = block.gsub(/(?<!\s|\[)\[(.*?)\]/, ' [\1]') # add missing spaces before square brackets
       block = block.gsub(/\](?=[^\s])/, '] ') # add missing spaces after square brackets
-      block = block.gsub(/(<\w+>)\s+|\s+(<\/\w+>)/, '\1\2').gsub(/>\s*</, '> <') # Ensure no space after an opening HTML tag and before a closing HTML tag, but a space between HTML tags
+      # Move whitespace from inside HTML tags to outside, preserving word separation
+      # Handle opening tags: space after opening tag
+      block = block.gsub(/(?<=\S)((?:<\w+>)+)\s+/, ' \1')   # text<i> word → text <i>word (move space before tag)
+                   .gsub(/(?<=\s)((?:<\w+>)+)\s+/, '\1')    # text <i> word → text <i>word (remove; space already before)
+                   .gsub(/^((?:<\w+>)+)\s+/, '\1')          # <i> word at line start → <i>word (remove; nothing to separate)
+      # Handle closing tags: space before closing tag
+      block = block.gsub(/\s+((?:<\/\w+>)+)(?=\S)/, '\1 ')  # text </i>word → text</i> word (move space after tag)
+                   .gsub(/\s+((?:<\/\w+>)+)(?=\s|$)/, '\1') # text </i> more → text</i> more (remove; space already after)
+      # Ensure space between closing tag followed by opening tag (different elements)
+      # But NOT between nested tags like <b><i> or </i></b>
+      block = block.gsub(/(<\/\w+>)\s*(<\w+>)/, '\1 \2')
 
       # Trim spaces before and after each line
       block = block.lines.map(&:strip).join("\n")
