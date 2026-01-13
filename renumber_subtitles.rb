@@ -128,6 +128,9 @@ def renumber_srt_files(path)
       # Handle closing tags: space before closing tag
       block = block.gsub(/\s+((?:<\/\w+>)+)(?=\S)/, '\1 ')  # text </i>word → text</i> word (move space after tag)
                    .gsub(/\s+((?:<\/\w+>)+)(?=\s|$)/, '\1') # text </i> more → text</i> more (remove; space already after)
+      # Fix missing spaces around tags (handles already-broken subtitles)
+      block = block.gsub(/((?:<\/\w+>)+)(?=[\p{L}\p{N}])/u, '\1 ')  # </i>word → </i> word
+                   .gsub(/([\p{L}\p{N}])((?:<\w+>)+)/u, '\1 \2')    # word<i> → word <i>
       # Ensure space between closing tag followed by opening tag (different elements)
       # But NOT between nested tags like <b><i> or </i></b>
       block = block.gsub(/(<\/\w+>)\s*(<\w+>)/, '\1 \2')
